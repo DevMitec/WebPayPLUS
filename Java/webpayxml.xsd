@@ -55,7 +55,13 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-    		<xs:element name="amount" type="xs:decimal"/>
+    		<xs:element name="amount">
+    			<xs:simpleType>
+    				<xs:restriction base="xs:decimal">
+    					<xs:minExclusive value="0"></xs:minExclusive>
+    				</xs:restriction>
+    			</xs:simpleType>
+    		</xs:element>
     		<xs:element name="moneda">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -79,6 +85,15 @@
 				</xs:simpleType>
 			</xs:element>
 			
+			<xs:element name="promociones" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="40" />
+						<xs:pattern value="C|(C,)?([1-9][0-9]?)(,([1-9][0-9]?))*" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+
 			<xs:element name="st_correo" default="" minOccurs="0">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -119,7 +134,7 @@
 
     <xs:complexType name="DataType">
     	<xs:sequence>
-    		<xs:element name="label" default="" minOccurs="0" maxOccurs="1" >
+    		<xs:element name="label" default="" minOccurs="1" maxOccurs="1" >
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
 						<xs:maxLength value="30" />
