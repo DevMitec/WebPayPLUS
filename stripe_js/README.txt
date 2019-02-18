@@ -10,3 +10,6 @@ test expiration date: any valid date set in the future
 test CV : any 3 digit number
 test pin code: any 4 digit number
 authorization: your stripe.js secret key (sk_test_xxxxxxxxxxxxxxxxxxxxxxxx)
+
+To start RUN npm install
+To run the server RUN node server.js
