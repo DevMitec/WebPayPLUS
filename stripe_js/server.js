@@ -52,7 +52,7 @@ var app= http.createServer(function(request, response)
 				{
 					'Content-Type': 'application/x-www-form-urlencoded',
 					'Content-Length': postData.length,
-					'Authorization' : "Bearer sk_test_iDt5cklfpnOPXwDdct2ZAnzx"
+					'Authorization' : "Bearer sk_test_xxxxxxxxxxxxxxxxxxxxxxxx"
 				}
 			};
 
