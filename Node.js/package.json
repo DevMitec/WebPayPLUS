@@ -1,0 +1,12 @@
+{
+  "name": "stripe_js",
+  "version": "1.0.0",
+  "description": "This is a test server used to make payments using stripe.js\r Step 1: signup to stripe.js and optain your secret key (sk_test_xxxxxxxxxxxxxxxxxxxxxxxx) and public key (pk_test_xxxxxxxxxxxxxxxxxxxxxxxx)\r Step 1: create a payment token and charge object (this is handled in the front end,\r \t\ta post request will be sent to the server with the token and the amount details)\r Step 2: send a post request from server to the stripe.js api, with the token and the payment details.\r Step 3: once stripe processes the payment request, a charge or transactiuon object will be sent back.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
