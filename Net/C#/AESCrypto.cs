@@ -10,7 +10,7 @@ using System.IO;
 // @author MIT
 // @version 1.0
 // @date 2017/10/10
-//
+// Clase para cifrado/descifrado en c#
 
 
 namespace webpayplus
