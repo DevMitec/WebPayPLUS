@@ -1,69 +1,42 @@
 <?php
 
-class AESCrypto {
+/**
+ * @author Mercadotecnia, Ideas y Tecnologia
+ * @version 1.0
+ * @date 2017/10/10
+ * 
+ * En php.ini habilitar la linea extension=php_openssl.dll (o equivalente a linux)
+ */
+
+    class AESCrypto{
     
-    private const OPENSSL_CIPHER_NAME = "aes-128-cbc";
-    private const CIPHER_KEY_LEN = 16; //128 bits
-    //define('CIPHER_KEY_LEN', "16");
-    //define('OPENSSL_CIPHER_NAME', 'aes-128-cbc');
-    
-    private static function fixKey($key) {
-        
-        if (strlen($key) < AesCipher::CIPHER_KEY_LEN) {
-            //0 pad to len 16
-            return str_pad("$key", AesCipher::CIPHER_KEY_LEN, "0"); 
-        }
-        
-        if (strlen($key) > AesCipher::CIPHER_KEY_LEN) {
-            //truncate to 16 bytes
-            return substr($key, 0, AesCipher::CIPHER_KEY_LEN); 
+      /**
+       * Permite cifrar una cadena a partir de un llave proporcionada
+       * @param strToEncrypt
+       * @param key
+       * @return String con la cadena encriptada
+       */
+
+      public static function encriptar($plaintext, $key128){
+          $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-128-cbc'));
+          $cipherText = openssl_encrypt ( $plaintext, 'AES-128-CBC', hex2bin($key128), 1, $iv);
+          return base64_encode($iv.$cipherText);
         }
 
-        return $key;
-    }
 
-    /**
-    * Encrypt data using AES Cipher (CBC) with 128 bit key
-    * 
-    * @param type $key - key to use should be 16 bytes long (128 bits)
-    * @param type $data - data to encrypt
-    * @return encrypted data in base64 encoding with iv attached at end after a :
-    */
-    static function encrypt($key, $data) {
-        $ivlen = openssl_cipher_iv_length('AES-128-CBC');
-        $iv = openssl_random_pseudo_bytes($ivlen);
-        $encodedEncryptedData = base64_encode(openssl_encrypt($data, 'aes-128-cbc', AesCipher::fixKey($key), OPENSSL_RAW_DATA, $iv));
-        $encodedIV = base64_encode($iv);
-        $encryptedPayload = $encodedEncryptedData.":".$encodedIV;
+      /**
+       * Permite descifrar una cadena a partir de un llave proporcionada
+       * @param strToDecrypt
+       * @param key
+       * @return String con la cadena descifrada
+       */
 
-        return base64_encode($encryptedPayload);
-    }
-
-    /**
-    * Decrypt data using AES Cipher (CBC) with 128 bit key
-    * 
-    * @param type $key - key to use should be 16 bytes long (128 bits)
-    * @param type $data - data to be decrypted in base64 encoding with iv attached at the end after a :
-    * @return decrypted data
-    */
-    static function decrypt($key, $data) {
-		$data = base64_decode($data);
-        $parts = explode(':', $data); //Separate Encrypted data from iv.
-        $encrypted = $parts[0];
-        $iv = $parts[1];
-        //$ivlen = openssl_cipher_iv_length('AES-128-CBC');
-        //$iv = openssl_random_pseudo_bytes($ivlen);
-        $decryptedData = openssl_decrypt(base64_decode($encrypted), 'aes-128-cbc', AesCipher::fixKey($key), OPENSSL_RAW_DATA, base64_decode($iv));
-
-        return $decryptedData;
-    }
-};
-echo '<br>';
-//$decrypted = AesCipher::decrypt('0123456789abcdef', 'G0a6cK+sxBkSwyCjcG4efA==:YWJjZGVmOTg3NjU0MzIxMA==');
-$encrypted = AesCipher::encrypt('0123456789abcdef','pruebadesdephp7');
-var_dump($encrypted);
-$decrypted = AesCipher::decrypt('0123456789abcdef', 'T1I2aFZoTkRSbzQ4bDhoc2hlVkYyQT09Ok1aVjNiVHc2ektEVnp4SllBYlZ6U2c9PQ==');
-echo '<br>';
-var_dump($decrypted);
-
+      public static function desencriptar($encodedInitialData, $key128){
+        $encodedInitialData =  base64_decode($encodedInitialData);
+        $iv = substr($encodedInitialData,0,16);
+        $encodedInitialData = substr($encodedInitialData,16);
+        $decrypted = openssl_decrypt($encodedInitialData, 'AES-128-CBC', hex2bin($key128), 1, $iv);
+        return $decrypted;
+      }
+}
 ?>
