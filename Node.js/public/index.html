@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang= "en">
+<head>
+  <meta charset= "UTF-8" name= "viewport" content= "width= device-width, initial-scale= 1.0">
+  <title>payment</title>
+  <style>
+    #amount{padding: 10px 5px 10px 5px; border: none; border-radius: 5px; font-weight: bolder; margin: 10px;}
+    label{color: white; font-size: 1.1em; padding: 5px; margin: auto;}
+    #currency{margin: 10px; padding: 10px 5px 10px 5px;}
+    body{background-color: rgba(0, 0, 0, 0.7);}
+    #payment-form{width: 50vw; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);}
+    #submit_payment{width: 50vw; padding: 10px; border: none; background-color: orange; font-weight: bold; margin-top: 20px;}
+    #card-errors{margin-top: 10px;}
+    #card-element-label{font-weight: bold; padding: 5px;}
+    #card-element{margin-top: 10px;}
+    .StripeElement{background-color: white; height: 40px; padding: 10px 12px; border-radius: 4px; border: 1px solid transparent; box-shadow: 0 1px 3px 0 #e6ebf1; -webkit-transition: box-shadow 150ms ease; transition: box-shadow 150ms ease;}
+    .StripeElement--focus{box-shadow: 0 1px 3px 0 #cfd7df;}
+    .StripeElement--invalid{border-color: #fa755a;}
+    .StripeElement--webkit-autofill{background-color: #fefde5 !important;}
+  </style>
+</head>
+<body>
+  <script src="https://js.stripe.com/v3/"></script>
+  <form action="/charge" method="post" id="payment-form">
+    <label>Amount</label><input id= "amount" type= "number" min= 5 value= 5>
+    <label>Currency</label>
+    <select id= "currency">
+    <option value="usd">USD</option>
+    <option value="inr">INR</option>
+    <option value="eur">EUR</option>
+    <option value="gbp">GBP</option>
+    </select>
+    <div class="form-row">
+      <label id= "card-element-label" for="card-element">Credit or debit card</label>
+      <div id="card-element"><!-- A Stripe Element will be inserted here. --></div>
+      <!-- Used to display form errors. -->
+      <div id="card-errors" role="alert"></div>
+    </div>
+    <button id= "submit_payment">Submit Payment</button>
+  </form>
+  <script>
+    // Create a Stripe client.
+    var stripe = Stripe('pk_test_xxxxxxxxxxxxxxxxxxxxxxxx');//public key
+    // Create an instance of Elements.
+    var elements = stripe.elements();
+    // Custom styling can be passed to options when creating an Element.
+    // (Note that this demo uses a wider set of styles than the guide below.)
+    var style = 
+    {
+      base: {color: '#32325d', padding: '10px', fontFamily: '"Helvetica Neue", Helvetica, sans-serif', fontSmoothing: 'antialiased', fontSize: '16px',
+        '::placeholder': {color: '#aab7c4'}},
+      invalid: {color: '#fa755a', iconColor: '#fa755a'}
+    };
+
+    // Create an instance of the card Element.
+    var card = elements.create('card', {style: style});
+    // Add an instance of the card Element into the `card-element` <div>.
+    card.mount('#card-element');
+    // Handle real-time validation errors from the card Element.
+    card.addEventListener('change', function(event) 
+    {
+      var displayError = document.getElementById('card-errors');
+      if (event.error) 
+        displayError.textContent = event.error.message;
+      else 
+        displayError.textContent = '';
+    });
+
+    // Handle form submission.
+    var form = document.getElementById('payment-form');
+    form.addEventListener('submit', function(event) 
+    {
+      event.preventDefault();
+      stripe.createToken(card).then(function(result) 
+      {
+        if(result.error) 
+        {
+          // Inform the user if there was an error.
+          var errorElement = document.getElementById('card-errors');
+          errorElement.textContent = result.error.message;
+        } 
+        else 
+        {
+          // Send the token to your server.
+          let settings= 
+          {
+            method: "POST", mode: "cors", cache: "no-cache",
+            headers:{
+              "Content-Type": "application/json; charset=utf-8"},
+            body: JSON.stringify({source: result.token.id, currency: document.getElementById("currency").value, amount: document.getElementById("amount").value * 100})
+          };
+          console.log(result.token);
+          fetch(location.origin + "/", settings)
+          .then(function(response){return response.text();})
+          .then((body) => {
+            console.log(body);
+            window.alert(body);
+          })
+          .catch(error => console.log(error));
+        }
+      });
+    });
+  </script>
+</body>
+</html>
